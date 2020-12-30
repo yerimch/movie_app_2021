@@ -1,49 +1,43 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import PropTypes from 'prop-types';
+//import ReactDOM from 'react-dom';
+//import PropTypes from 'prop-types';
+import axios from 'axios';
+import Movie from './movie'
 
-const LanguageILike = [
-  {
-    Id:1,
-    name : "cplusplus",
-    image : "https://www.flaticon.com/svg/static/icons/svg/919/919841.svg",
-    rating : 5.0
-  },
-  {
-    Id : 2,
-    name : "python",
-    image : "https://www.flaticon.com/svg/static/icons/svg/919/919852.svg",
-    rating : 4.9
-  },
-  {
-    Id : 3,
-    name : "javascript",
-    image :"https://www.flaticon.com/svg/static/icons/svg/919/919828.svg",
-    rating :  4.8
+class App extends React.Component {
+  state={
+    isLoading:true,
+    movies:[]
+  };
+  getMovies = async ()=>{
+    const {
+      data:{
+        data:{movies}
+      }
+    } = await axios.get("https://yts-proxy.nomadcoders1.now.sh/list_movies.json?sort_by=rating");
+    this.setState({movies, isLoading:false})
+  };
+  componentDidMount(){
+    this.getMovies();
   }
-]
-
-function Languages({name, img, rat})
-{
-  return (
-    <div>
-      <h3>I Like {name}</h3>
-      <h4>{rat}/5.0</h4>
-      <img src={img} alt="이미지 대신 삽입 되는 문구(시각장애인용)" width="150px" height="150px"></img>
-    </div>
-  );
-}
-
-Languages.propTypes={
-  name : PropTypes.string.isRequired,
-  img : PropTypes.string.isRequired,
-  rat : PropTypes.number
-};
-
-function App() {
-  return (
-    <div>{LanguageILike.map(Language=><Languages key={Language.Id} name={Language.name} img={Language.image} rat={Language.rating} />)}</div>
-  );
+  render(){
+    const {isLoading, movies}=this.state;
+    return(
+      <div>
+        {isLoading?"Loading...":movies.map(movie=>(
+        <Movie 
+        key={movie.id} 
+        id={movie.id} 
+        year={movie.year} 
+        title={movie.title} 
+        summary={movie.summary} 
+        poster={movie.medium_cover_image} />
+        )
+        )
+        }
+      </div>
+    );
+  }
 }
 
 export default App;
